@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+
+// This tells TypeScript: 
+// "Hey, go look at the @types/node package and learn what process, Buffer, __dirname, etc. are!"
+// Since playwright.config.ts
+//  uses process.env.CI on lines 19, 21, and 23 — 
+// TypeScript now recognizes process and the 3 red squiggly errors disappear 🎯
