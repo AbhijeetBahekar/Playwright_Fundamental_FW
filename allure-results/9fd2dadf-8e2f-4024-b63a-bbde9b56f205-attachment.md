@@ -1,0 +1,105 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: 07_WebTables\assignment.spec.ts >> Verify the terminated employee 
+- Location: tests\07_WebTables\assignment.spec.ts:5:5
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+```
+Error: locator.isDisabled: Test timeout of 30000ms exceeded.
+Call log:
+  - waiting for locator('.bi-chevron-right')
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e6]:
+    - img "company-branding" [ref=e8]
+    - generic [ref=e9]:
+      - heading "Login" [level=5] [ref=e10]
+      - generic [ref=e12]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: 
+            - generic [ref=e17]: Username
+          - textbox "Username" [ref=e19]
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: 
+            - generic [ref=e24]: Password
+          - textbox "Password" [ref=e26]
+        - button "Login" [ref=e28] [cursor=pointer]
+        - paragraph [ref=e30] [cursor=pointer]: Forgot your password?
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - link [ref=e33] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/orangehrm/mycompany/
+          - link [ref=e36] [cursor=pointer]:
+            - /url: https://www.facebook.com/OrangeHRM/
+          - link [ref=e39] [cursor=pointer]:
+            - /url: https://twitter.com/orangehrm?lang=en
+          - link [ref=e42] [cursor=pointer]:
+            - /url: https://www.youtube.com/c/OrangeHRMInc
+        - generic [ref=e45]:
+          - paragraph [ref=e46]: OrangeHRM OS 5.3
+          - paragraph [ref=e47]:
+            - text: © 2005 - 2026
+            - link "OrangeHRM, Inc" [ref=e48] [cursor=pointer]:
+              - /url: http://www.orangehrm.com
+            - text: . All rights reserved.
+  - img "orangehrm-logo" [ref=e50]
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | import dotenv from "dotenv";
+  3  | dotenv.config();
+  4  | 
+  5  | test('Verify the terminated employee ', async ({ page }) => {
+  6  | 
+  7  |     await page.goto("https://awesomeqa.com/hr/web/index.php/auth/login");
+  8  |     await page.waitForTimeout(2000);
+  9  | 
+  10 |     await page.fill('input[name="username"]', process.env.ORANGE_USERNAME!);
+  11 |     await page.fill('input[name="password"]', process.env.ORANGE_PASSWORD!);
+  12 |     await page.waitForTimeout(1500);
+  13 |     const sub = await page.locator(".orangehrm-login-button");
+  14 |     sub.click();
+  15 | 
+  16 |     let empStatus: string = "Terminated";
+  17 |     let row;
+  18 |     while(true) {
+  19 |         row = page.locator('.oxd-table-cell').filter({ hasText: empStatus});
+  20 |         if (await row.count()){
+  21 |             break;
+  22 |         }
+  23 |         const next = page.locator('.bi-chevron-right');
+> 24 |         if(await next.isDisabled()) throw new Error ("Error - row not found");
+     |                       ^ Error: locator.isDisabled: Test timeout of 30000ms exceeded.
+  25 |         await next.click();
+  26 |     }
+  27 | 
+  28 |     const firstName = await row.locator("//div[@role='cell'][div[text()='Terminated']]/preceding-sibling::div[3]").innerText();
+  29 |     const lastName = await row.locator("//div[@role='cell'][div[text()='Terminated']]/preceding-sibling::div[2]").innerText();
+  30 |     console.log(firstName, lastName)
+  31 |     await page.waitForTimeout(5000);
+  32 | 
+  33 | 
+  34 | 
+  35 | })
+```
